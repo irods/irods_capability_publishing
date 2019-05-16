@@ -101,7 +101,7 @@ namespace {
                     if(idx.publishing_metadata_exists_in_path(obj_inp->objPath)) {
                         THROW(
                             SYS_INVALID_OPR_TYPE,
-                            boost::format("object is published and now imutable [%s]")
+                            boost::format("object is published and now immutable [%s]")
                             % obj_inp->objPath);
                     }
                 }
@@ -120,7 +120,7 @@ namespace {
                 if(idx.publishing_metadata_exists_in_path(coll_inp->collName)) {
                     THROW(
                         SYS_INVALID_OPR_TYPE,
-                        boost::format("collection is published and now imutable [%s]")
+                        boost::format("collection is published and now immutable [%s]")
                         % coll_inp->collName);
                 }
 
@@ -145,29 +145,33 @@ namespace {
                 const std::string object_path{avu_inp->arg2};
                 const std::string add{"add"};
                 const std::string set{"set"};
+                const std::string rm{"rm"};
                 const std::string collection{"-C"};
                 const std::string object{"-d"};
 
                 irods::publishing::publisher idx{_rei, config->instance_name_};
-                if(operation == set || operation == add) {
-                    if(config->publish == attribute) {
-                        // was the added tag an publishing indicator
-                        // verify that this is not new metadata with a query and set a flag
-                        if(type == collection) {
-                            metadata_is_new = !idx.metadata_exists_on_collection(
-                                                             object_path,
-                                                             avu_inp->arg3,
-                                                             avu_inp->arg4,
-                                                             avu_inp->arg5);
-                        }
-                        if(type == object) {
-                            metadata_is_new = !idx.metadata_exists_on_object(
-                                                             object_path,
-                                                             avu_inp->arg3,
-                                                             avu_inp->arg4,
-                                                             avu_inp->arg5);
-                        }
-                    }
+                // was the added tag an publishing indicator
+                // verify that this is not new metadata with a query and set a flag
+                if(type == collection) {
+                    metadata_is_new = !idx.metadata_exists_on_collection(
+                                                     object_path,
+                                                     avu_inp->arg3,
+                                                     avu_inp->arg4,
+                                                     avu_inp->arg5);
+                }
+                else if(type == object) {
+                    metadata_is_new = !idx.metadata_exists_on_object(
+                                                     object_path,
+                                                     avu_inp->arg3,
+                                                     avu_inp->arg4,
+                                                     avu_inp->arg5);
+                }
+
+                if(operation == rm) {
+                    THROW(
+                        SYS_INVALID_OPR_TYPE,
+                        boost::format("publishing metadata tags are immutable [%s]")
+                        % object_path);
                 }
             }
             else if("pep_api_mod_avu_metadata_post" == _rn) {
