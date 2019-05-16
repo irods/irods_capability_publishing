@@ -75,6 +75,12 @@ namespace {
         return std::make_tuple(l1_idx, resource_name);
     } // get_object_path_and_resource
 
+    bool user_has_administrative_privileges(
+        ruleExecInfo_t* _rei ) {
+        return (_rei->rsComm->clientUser.authInfo.authFlag >= REMOTE_PRIV_USER_AUTH);
+    } // user_has_administrative_privileges
+
+
     void apply_publishing_policy(
         const std::string &    _rn,
         ruleExecInfo_t*        _rei,
@@ -150,7 +156,7 @@ namespace {
                 const std::string object{"-d"};
 
                 irods::publishing::publisher idx{_rei, config->instance_name_};
-                // was the added tag an publishing indicator
+                // was the added tag a publishing indicator?
                 // verify that this is not new metadata with a query and set a flag
                 if(type == collection) {
                     metadata_is_new = !idx.metadata_exists_on_collection(
@@ -167,7 +173,7 @@ namespace {
                                                      avu_inp->arg5);
                 }
 
-                if(operation == rm) {
+                if(operation == rm && !user_has_administrative_privileges(_rei)) {
                     THROW(
                         SYS_INVALID_OPR_TYPE,
                         boost::format("publishing metadata tags are immutable [%s]")
