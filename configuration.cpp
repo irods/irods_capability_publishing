@@ -17,6 +17,7 @@ namespace irods {
 
                 capture_parameter("publish", publish);
                 capture_parameter("api_token", api_token);
+                capture_parameter("persistent_identifier", persistent_identifier);
                 capture_parameter("minimum_delay_time", minimum_delay_time);
                 capture_parameter("maximum_delay_time", maximum_delay_time);
                 capture_parameter("delay_parameters",   delay_parameters);
