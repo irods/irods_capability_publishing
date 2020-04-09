@@ -55,11 +55,12 @@ namespace irods {
             // metadata attributes
             std::string publish{"irods::publishing::publish"};
             std::string api_token{"irods::publishing::api_token"};
+            std::string persistent_identifier{"irods::publishing::persistent_identifier"};
 
             // basic configuration
             std::string minimum_delay_time{"1"};
             std::string maximum_delay_time{"30"};
-            std::string delay_parameters{"<EF>60s DOUBLE UNTIL SUCCESS OR 5 TIMES</EF>"};
+            std::string delay_parameters{""};//<EF>60s DOUBLE UNTIL SUCCESS OR 5 TIMES</EF>"};
             int log_level{LOG_DEBUG};
 
             const std::string instance_name_{};

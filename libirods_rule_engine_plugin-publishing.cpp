@@ -91,8 +91,7 @@ namespace {
             // NOTE:: 3rd parameter is the target
             if("pep_api_data_obj_open_pre"   == _rn ||
                "pep_api_data_obj_create_pre" == _rn ||
-               "pep_api_data_obj_put_pre"    == _rn ||
-               "pep_api_data_obj_unlink_pre" == _rn) {
+               "pep_api_data_obj_put_pre"    == _rn) {
                 auto it = _args.begin();
                 std::advance(it, 2);
                 if(_args.end() == it) {
@@ -110,6 +109,24 @@ namespace {
                             boost::format("object is published and now immutable [%s]")
                             % obj_inp->objPath);
                     }
+                }
+            }
+            else if("pep_api_data_obj_unlink_pre" == _rn) {
+                auto it = _args.begin();
+                std::advance(it, 2);
+                if(_args.end() == it) {
+                    THROW(
+                        SYS_INVALID_INPUT_PARAM,
+                        "invalid number of arguments");
+                }
+
+                auto obj_inp = boost::any_cast<dataObjInp_t*>(*it);
+                irods::publishing::publisher idx{_rei, config->instance_name_};
+                if(idx.publishing_metadata_exists_in_path(obj_inp->objPath)) {
+                    THROW(
+                        SYS_INVALID_OPR_TYPE,
+                        boost::format("object is published and now immutable [%s]")
+                        % obj_inp->objPath);
                 }
             }
             else if("pep_api_rm_coll_pre" == _rn) {
