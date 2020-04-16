@@ -67,57 +67,56 @@ namespace {
     std::string collection_purge_policy;
 
     std::string get_api_token_for_user(
-        rsComm_t*         _comm,
-        const std::string _user_name) {
+        rsComm_t*          _comm,
+        const std::string& _user_name) {
 
         std::string query_str{
             boost::str(boost::format(
             "SELECT META_USER_ATTR_VALUE where USER_NAME = '%s' and META_USER_ATTR_NAME = '%s'")
             % _user_name
             % config->api_token)};
-        irods::query qobj{_comm, query_str, 1};
+        irods::query<rsComm_t> qobj{_comm, query_str, 1};
+
+        if(qobj.size() == 0) {
+            THROW(
+                CAT_NO_ROWS_FOUND,
+                "API Key not found");
+        }
+
         return qobj.front()[0];
 
     } // get_api_token_for_user
 
     void apply_persistent_identifier_policy(
         ruleExecInfo_t*    _rei,
-        const std::string& _object_path,
-        std::string*       _pid) {
-
+        const std::string& _object_path) {
+        std::string pid;
         std::list<boost::any> args;
         args.push_back(boost::any(_object_path));
-        args.push_back(boost::any(_pid));
+        args.push_back(boost::any(std::string{"dataworld"}));
+        args.push_back(boost::any(&pid));
         std::string policy_name = irods::publishing::policy::compose_policy_name(
                                   irods::publishing::policy::prefix,
-                                  "persistent_identifier_dataworld");
+                                  "persistent_identifier");
+
         irods::publishing::invoke_policy(_rei, policy_name, args);
 
+        modAVUMetadataInp_t set_op{
+            .arg0 = "set",
+            .arg1 = "-d",
+            .arg2 = const_cast<char*>(_object_path.c_str()),
+            .arg3 = const_cast<char*>(config->persistent_identifier.c_str()),
+            .arg4 = const_cast<char*>(pid.c_str()),
+            .arg5 = nullptr};
+
+        auto status = rsModAVUMetadata(_rei->rsComm, &set_op);
+        if(status < 0) {
+            THROW(
+                status,
+                boost::format("failed to update object [%s] metadata")
+                % _object_path);
+        }
     } // apply_persistent_identifier_policy
-#if 0
-    std::string generate_id() {
-        using namespace boost::archive::iterators;
-        std::stringstream os;
-        typedef
-            base64_from_binary< // convert binary values to base64 characters
-                transform_width<// retrieve 6 bit integers from a sequence of 8 bit bytes
-                    const char *,
-                    6,
-                    8
-                >
-            >
-            base64_text; // compose all the above operations in to a new iterator
-
-        boost::uuids::uuid uuid{boost::uuids::random_generator()()};
-        std::string uuid_str = boost::uuids::to_string(uuid);
-        std::copy(
-            base64_text(uuid_str.c_str()),
-            base64_text(uuid_str.c_str() + uuid_str.size()),
-            ostream_iterator<char>(os));
-
-        return os.str();
-    } // generate_id
-#endif
 
     std::string create_dataset(
         const std::string& _object_path,
@@ -166,7 +165,7 @@ namespace {
             r.url.c_str());
 
         // we need to parse the response json, and get the data set id from the uri
-        std::string uri{response["uri"]};
+        std::string uri = response["uri"];
         boost::filesystem::path p{uri};
         data_set_id = p.filename().string();
 
@@ -219,12 +218,6 @@ namespace {
         namespace fsvr = irods::experimental::filesystem::server;
 
         try {
-            std::string pid{"persistent_identifier"};
-            /*apply_persistent_identifier_policy(
-                _rei,
-                _object_path,
-                _source_resource,
-                &pid);*/
 
             const auto api_token{get_api_token_for_user(_rei->rsComm, _user_name)};
             auto data_set_id = create_dataset(
@@ -247,6 +240,11 @@ namespace {
                 _object_path,
                 read_buff,
                 read_size);
+
+            apply_persistent_identifier_policy(
+                _rei,
+                _object_path);
+
         }
         catch(const std::runtime_error& _e) {
             rodsLog(
@@ -303,6 +301,10 @@ namespace {
                             p.path().string(),
                             read_buff,
                             read_size);
+
+                        apply_persistent_identifier_policy(
+                            _rei,
+                            p.path().string());
                     }
                 }
                 catch(const irods::exception& _e) {
@@ -332,7 +334,7 @@ namespace {
                 SYS_INTERNAL_ERR,
                 _e.what());
         }
-    } // invoke_publish_object_policy
+    } // invoke_publish_collection_policy
 
     void invoke_purge_object_policy(
         ruleExecInfo_t*    _rei,
@@ -426,9 +428,9 @@ irods::error exec_rule(
     try {
         if(_rn == object_publish_policy) {
             auto it = _args.begin();
-            const std::string object_path{ boost::any_cast<std::string>(*it) }; ++it;
-            const std::string user_name{ boost::any_cast<std::string>(*it) }; ++it;
-            const std::string publish_type{ boost::any_cast<std::string>(*it) }; ++it;
+            const std::string object_path{ irods::publishing::any_to_string(*it) }; ++it;
+            const std::string user_name{ irods::publishing::any_to_string(*it) }; ++it;
+            const std::string publish_type{ irods::publishing::any_to_string(*it) }; ++it;
 
             invoke_publish_object_policy(
                 rei,
@@ -438,9 +440,9 @@ irods::error exec_rule(
         }
         else if(_rn == object_purge_policy) {
             auto it = _args.begin();
-            const std::string object_path{ boost::any_cast<std::string>(*it) }; ++it;
-            const std::string user_name{ boost::any_cast<std::string>(*it) }; ++it;
-            const std::string publish_type{ boost::any_cast<std::string>(*it) }; ++it;
+            const std::string object_path{ irods::publishing::any_to_string(*it) }; ++it;
+            const std::string user_name{ irods::publishing::any_to_string(*it) }; ++it;
+            const std::string publish_type{ irods::publishing::any_to_string(*it) }; ++it;
 
             invoke_purge_object_policy(
                 rei,
@@ -450,9 +452,9 @@ irods::error exec_rule(
         }
         else if(_rn == collection_publish_policy) {
             auto it = _args.begin();
-            const std::string collection_name{ boost::any_cast<std::string>(*it) }; ++it;
-            const std::string user_name{ boost::any_cast<std::string>(*it) }; ++it;
-            const std::string publish_type{ boost::any_cast<std::string>(*it) }; ++it;
+            const std::string collection_name{ irods::publishing::any_to_string(*it) }; ++it;
+            const std::string user_name{ irods::publishing::any_to_string(*it) }; ++it;
+            const std::string publish_type{ irods::publishing::any_to_string(*it) }; ++it;
 
             invoke_publish_collection_policy(
                 rei,
@@ -463,9 +465,9 @@ irods::error exec_rule(
         }
         else if(_rn == collection_purge_policy) {
             auto it = _args.begin();
-            const std::string collection_name{ boost::any_cast<std::string>(*it) }; ++it;
-            const std::string user_name{ boost::any_cast<std::string>(*it) }; ++it;
-            const std::string publish_type{ boost::any_cast<std::string>(*it) }; ++it;
+            const std::string collection_name{ irods::publishing::any_to_string(*it) }; ++it;
+            const std::string user_name{ irods::publishing::any_to_string(*it) }; ++it;
+            const std::string publish_type{ irods::publishing::any_to_string(*it) }; ++it;
         }
         else {
             return ERROR(
