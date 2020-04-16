@@ -28,7 +28,7 @@ namespace {
         std::vector<std::string> hosts_;
         int                      bulk_count_{100};
         int                      read_size_{4194304};
-        configuration(const std::string& _instance_name) :
+        explicit configuration(const std::string& _instance_name) :
             instance_name_{_instance_name} {
             try {
                 auto cfg = irods::publishing::get_plugin_specific_configuration(_instance_name);
