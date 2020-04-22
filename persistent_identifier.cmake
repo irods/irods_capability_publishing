@@ -1,4 +1,4 @@
-set(POLICY_NAME "publishing")
+set(POLICY_NAME "persistent_identifier")
 
 string(REPLACE "_" "-" POLICY_NAME_HYPHENS ${POLICY_NAME})
 set(IRODS_PACKAGE_COMPONENT_POLICY_NAME "${POLICY_NAME_HYPHENS}${IRODS_PACKAGE_FILE_NAME_SUFFIX}")
@@ -22,20 +22,17 @@ add_library(
     ${TARGET_NAME}
     MODULE
     ${CMAKE_SOURCE_DIR}/lib${TARGET_NAME}.cpp
+    ${CMAKE_SOURCE_DIR}/utilities.cpp
     ${CMAKE_SOURCE_DIR}/configuration.cpp
     ${CMAKE_SOURCE_DIR}/plugin_specific_configuration.cpp
-    ${CMAKE_SOURCE_DIR}/utilities.cpp
-    ${CMAKE_SOURCE_DIR}/publishing_utilities.cpp
     )
 
 target_include_directories(
     ${TARGET_NAME}
     PRIVATE
-    /opt/irods-externals/json3.7.3-0/include
     ${IRODS_INCLUDE_DIRS}
     ${IRODS_EXTERNALS_FULLPATH_BOOST}/include
     ${IRODS_EXTERNALS_FULLPATH_JSON}/include
-    ${IRODS_EXTERNALS_FULLPATH_JANSSON}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
 
@@ -43,7 +40,6 @@ target_link_libraries(
     ${TARGET_NAME}
     PRIVATE
     ${IRODS_PLUGIN_POLICY_LINK_LIBRARIES}
-    ${IRODS_EXTERNALS_FULLPATH_BOOST}/lib/libboost_filesystem.so
     irods_common
     )
 
@@ -59,37 +55,13 @@ install(
   COMPONENT ${IRODS_PACKAGE_COMPONENT_POLICY_NAME}
   )
 
-install(
-  FILES
-  ${CMAKE_SOURCE_DIR}/packaging/test_plugin_publishing.py
-  DESTINATION ${IRODS_HOME_DIRECTORY}/scripts/irods/test
-  PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
-  COMPONENT ${IRODS_PACKAGE_COMPONENT_POLICY_NAME}
-  )
-
-install(
-  FILES
-  ${CMAKE_SOURCE_DIR}/packaging/run_publishing_plugin_test.py
-  DESTINATION ${IRODS_HOME_DIRECTORY}/scripts
-  PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
-  COMPONENT ${IRODS_PACKAGE_COMPONENT_POLICY_NAME}
-  )
-
-install(
-  FILES
-  ${CMAKE_SOURCE_DIR}/example_publishing_invocation.r
-  DESTINATION ${IRODS_HOME_DIRECTORY}
-  PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ
-  COMPONENT ${IRODS_PACKAGE_COMPONENT_POLICY_NAME}
-  )
-
-set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/packaging/postinst_tiering;")
-set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/packaging/postinst_tiering")
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_SOURCE_DIR}/packaging/postinst_movement;")
+set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${CMAKE_SOURCE_DIR}/packaging/postinst_movement")
 
 set(CPACK_PACKAGE_VERSION ${IRODS_PLUGIN_VERSION})
 set(CPACK_DEBIAN_${IRODS_PACKAGE_COMPONENT_POLICY_NAME_UPPERCASE}_FILE_NAME ${TARGET_NAME_HYPHENS}-${IRODS_PLUGIN_VERSION}-${IRODS_LINUX_DISTRIBUTION_NAME}-${IRODS_LINUX_DISTRIBUTION_VERSION_MAJOR}-${CMAKE_SYSTEM_PROCESSOR}.deb)
 
-set(CPACK_DEBIAN_${IRODS_PACKAGE_COMPONENT_POLICY_NAME_UPPERCASE}_PACKAGE_DEPENDS "${IRODS_PACKAGE_DEPENDENCIES_STRING}, irods-server (= ${IRODS_VERSION}), irods-runtime (= ${IRODS_VERSION}), libc6, irods-rule-engine-plugin-apply-access-time-2.5.0, irods-rule-engine-plugin-data-movement-2.5.0, irods-rule-engine-plugin-data-replication-2.5.0, irods-rule-engine-plugin-data-verification-2.5.0")
+set(CPACK_DEBIAN_${IRODS_PACKAGE_COMPONENT_POLICY_NAME_UPPERCASE}_PACKAGE_DEPENDS "${IRODS_PACKAGE_DEPENDENCIES_STRING}, irods-server (= ${IRODS_VERSION}), irods-runtime (= ${IRODS_VERSION}), libc6")
 
 set(CPACK_RPM_${IRODS_PACKAGE_COMPONENT_POLICY_NAME_UPPERCASE}_FILE_NAME ${TARGET_NAME_HYPHENS}-${IRODS_PLUGIN_VERSION}-${IRODS_LINUX_DISTRIBUTION_NAME}-${IRODS_LINUX_DISTRIBUTION_VERSION_MAJOR}-${CMAKE_SYSTEM_PROCESSOR}.rpm)
 
@@ -98,8 +70,4 @@ if (IRODS_LINUX_DISTRIBUTION_NAME STREQUAL "centos" OR IRODS_LINUX_DISTRIBUTION_
 elseif (IRODS_LINUX_DISTRIBUTION_NAME STREQUAL "opensuse")
     set(CPACK_RPM_${IRODS_PACKAGE_COMPONENT_POLICY_NAME}_PACKAGE_REQUIRES "${IRODS_PACKAGE_DEPENDENCIES_STRING}, irods-server = ${IRODS_VERSION}, irods-runtime = ${IRODS_VERSION}, libopenssl1_0_0")
 endif()
-
-set(CPACK_DEBIAN_PACKAGE_BREAKS "irods-rule-engine-plugin-tiered-storage")
-set(CPACK_DEBIAN_PACKAGE_REPLACES "irods-rule-engine-plugin-tiered-storage")
-set(CPACK_RPM_PACKAGE_OBSOLETES "irods-rule-engine-plugin-tiered-storage")
 

@@ -129,9 +129,12 @@ namespace irods {
             const std::string& _path) {
             namespace fs   = irods::experimental::filesystem;
             namespace fsvr = irods::experimental::filesystem::server;
+
+            using fsp = irods::experimental::filesystem::path;
+
             rsComm_t& comm = *rei_->rsComm;
             try {
-                fs::path full_path{_path};
+                fsp full_path{_path};
 
                 if(fsvr::is_data_object(comm, full_path) &&
                    object_is_published(_path)) {
@@ -141,8 +144,9 @@ namespace irods {
                     return true;
                 }
 
+                const auto root = fsp{std::string{fsp::preferred_separator}};
                 auto coll = full_path.parent_path();
-                while(!coll.empty()) {
+                while(coll != root) {
                     try {
                         if(collection_is_published(coll.string())) {
                             return true;
@@ -226,8 +230,8 @@ namespace irods {
 
         void publisher::schedule_object_publishing_event(
             const std::string& _object_path,
-            const std::string& _user_name,
-            const std::string& _publisher) {
+            const std::string& _publisher,
+            const std::string& _user_name) {
             try {
                 schedule_policy_event_for_object(
                     policy::object::publish,

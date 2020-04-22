@@ -7,6 +7,8 @@
 
 namespace irods {
     namespace publishing {
+        std::string any_to_string(boost::any& _a);
+
         void exception_to_rerror(
             const irods::exception& _exception,
             rError_t&               _error);
