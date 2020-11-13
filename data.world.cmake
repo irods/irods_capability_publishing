@@ -46,6 +46,7 @@ target_link_libraries(
     /opt/irods-externals/elasticlient0.1.0-0/lib/libelasticlient.so
     /opt/irods-externals/elasticlient0.1.0-0/lib/libjsoncpp.so
     /opt/irods-externals/cpr1.3.0-0/lib/libcpr.so
+    ${IRODS_EXTERNALS_FULLPATH_BOOST}/lib/libboost_system.so
     irods_common
     )
 
