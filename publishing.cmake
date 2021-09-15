@@ -33,7 +33,6 @@ target_include_directories(
     ${IRODS_INCLUDE_DIRS}
     ${IRODS_EXTERNALS_FULLPATH_BOOST}/include
     ${IRODS_EXTERNALS_FULLPATH_JSON}/include
-    ${IRODS_EXTERNALS_FULLPATH_JANSSON}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     )
 
