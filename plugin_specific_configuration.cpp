@@ -17,8 +17,7 @@ namespace irods {
                     const auto& inst_name = rule_engine.at( CFG_INSTANCE_NAME_KW ).get_ref<const std::string&>();
                     if ( inst_name == _instance_name ) {
                         if(rule_engine.count(CFG_PLUGIN_SPECIFIC_CONFIGURATION_KW) > 0) {
-                            return boost::any_cast<const std::unordered_map<std::string, boost::any>&>(
-                                    rule_engine.at(CFG_PLUGIN_SPECIFIC_CONFIGURATION_KW));
+                            return rule_engine.at(CFG_PLUGIN_SPECIFIC_CONFIGURATION_KW);
                         } // if has PSC
                     } // if inst_name
                 } // for rule_engines
