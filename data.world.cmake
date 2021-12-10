@@ -40,7 +40,6 @@ target_include_directories(
     ${IRODS_INCLUDE_DIRS}
     ${IRODS_EXTERNALS_FULLPATH_BOOST}/include
     ${IRODS_EXTERNALS_FULLPATH_FMT}/include
-    ${IRODS_EXTERNALS_FULLPATH_JSON}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${IRODS_EXTERNALS_FULLPATH_ELASTICCLIENT}/include/
     ${IRODS_EXTERNALS_FULLPATH_CPR}/include/
@@ -57,6 +56,7 @@ target_link_libraries(
     ${IRODS_EXTERNALS_FULLPATH_ELASTICCLIENT}/lib/libjsoncpp.so
     ${IRODS_EXTERNALS_FULLPATH_CPR}/lib/libcpr.so
     irods_common
+    nlohmann_json::nlohmann_json
     )
 
 target_compile_definitions(${TARGET_NAME} PRIVATE ${IRODS_PLUGIN_POLICY_COMPILE_DEFINITIONS} ${IRODS_COMPILE_DEFINITIONS} BOOST_SYSTEM_NO_DEPRECATED)
