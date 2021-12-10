@@ -52,6 +52,7 @@ target_link_libraries(
     ${IRODS_PLUGIN_POLICY_LINK_LIBRARIES}
     ${IRODS_EXTERNALS_FULLPATH_BOOST}/lib/libboost_filesystem.so
     ${IRODS_EXTERNALS_FULLPATH_BOOST}/lib/libboost_system.so
+    ${IRODS_EXTERNALS_FULLPATH_FMT}/lib/libfmt.so
     ${IRODS_EXTERNALS_FULLPATH_ELASTICCLIENT}/lib/libelasticlient.so
     ${IRODS_EXTERNALS_FULLPATH_ELASTICCLIENT}/lib/libjsoncpp.so
     ${IRODS_EXTERNALS_FULLPATH_CPR}/lib/libcpr.so
