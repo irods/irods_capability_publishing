@@ -1,20 +1,20 @@
 
 #define IRODS_IO_TRANSPORT_ENABLE_SERVER_SIDE_API
 
-#include "irods_query.hpp"
-#include "irods_re_plugin.hpp"
-#include "irods_re_ruleexistshelper.hpp"
+#include <irods/irods_query.hpp>
+#include <irods/irods_re_plugin.hpp>
+#include <irods/irods_re_ruleexistshelper.hpp>
 #include "utilities.hpp"
 #include "plugin_specific_configuration.hpp"
 #include "configuration.hpp"
-#include "dstream.hpp"
-#include "rsModAVUMetadata.hpp"
-#include "irods_hasher_factory.hpp"
-#include "MD5Strategy.hpp"
+#include <irods/dstream.hpp>
+#include <irods/rsModAVUMetadata.hpp>
+#include <irods/irods_hasher_factory.hpp>
+#include <irods/MD5Strategy.hpp>
 
 #define IRODS_FILESYSTEM_ENABLE_SERVER_SIDE_API
-#include "transport/default_transport.hpp"
-#include "filesystem.hpp"
+#include <irods/transport/default_transport.hpp>
+#include <irods/filesystem.hpp>
 
 #include "cpr/response.h"
 #include "cpr/session.h"
