@@ -3,8 +3,8 @@
 #include <string>
 #include "boost/any.hpp"
 #include <unordered_map>
-#include "irods_exception.hpp"
-#include "rodsErrorTable.h"
+#include <irods/irods_exception.hpp>
+#include <irods/rodsErrorTable.h>
 
 namespace irods {
     namespace publishing {

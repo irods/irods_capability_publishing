@@ -7,7 +7,7 @@
 #include <boost/any.hpp>
 #include <string>
 
-#include "rcMisc.h"
+#include <irods/rcMisc.h>
 #include "configuration.hpp"
 
 namespace irods {

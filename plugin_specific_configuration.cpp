@@ -1,7 +1,7 @@
 
 #include "plugin_specific_configuration.hpp"
-#include "irods_server_properties.hpp"
-#include "irods_exception.hpp"
+#include <irods/irods_server_properties.hpp>
+#include <irods/irods_exception.hpp>
 
 namespace irods {
     namespace publishing {

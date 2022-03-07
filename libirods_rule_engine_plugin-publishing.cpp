@@ -1,12 +1,12 @@
 
 // =-=-=-=-=-=-=-
 // irods includes
-#include "irods_re_plugin.hpp"
-#include "irods_re_ruleexistshelper.hpp"
-#include "irods_hierarchy_parser.hpp"
-#include "irods_resource_backport.hpp"
-#include "irods_query.hpp"
-#include "rsModAVUMetadata.hpp"
+#include <irods/irods_re_plugin.hpp>
+#include <irods/irods_re_ruleexistshelper.hpp>
+#include <irods/irods_hierarchy_parser.hpp>
+#include <irods/irods_resource_backport.hpp>
+#include <irods/irods_query.hpp>
+#include <irods/rsModAVUMetadata.hpp>
 
 #include "utilities.hpp"
 #include "publishing_utilities.hpp"
@@ -29,7 +29,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "objDesc.hpp"
+#include <irods/objDesc.hpp>
 extern l1desc_t L1desc[NUM_L1_DESC];
 
 int _delayExec(

@@ -2,7 +2,7 @@
 #define CONFIGURATION_HPP
 
 #include <string>
-#include "rodsLog.h"
+#include <irods/rodsLog.h>
 
 namespace irods {
     namespace publishing {
