@@ -1,6 +1,9 @@
 
 #include "configuration.hpp"
 #include "plugin_specific_configuration.hpp"
+#include <fmt/format.h>
+#include <irods/rodsLog.h>
+#include <irods/irods_log.hpp>
 
 namespace irods {
     namespace publishing {
@@ -10,8 +13,8 @@ namespace irods {
             try {
                 auto cfg = get_plugin_specific_configuration(_instance_name);
                 auto capture_parameter = [&](const std::string& _param, std::string& _attr) {
-                    if(cfg.find(_param) != cfg.end()) {
-                        _attr = boost::any_cast<std::string>(cfg.at(_param));
+                    if (const auto iter = cfg.find(_param); iter != cfg.end()) {
+                        _attr = iter->get<std::string>();
                     }
                 }; // capture_parameter
 
@@ -20,10 +23,21 @@ namespace irods {
                 capture_parameter("minimum_delay_time", minimum_delay_time);
                 capture_parameter("maximum_delay_time", maximum_delay_time);
                 capture_parameter("delay_parameters",   delay_parameters);
-            } catch ( const boost::bad_any_cast& _e ) {
-                THROW( INVALID_ANY_CAST, _e.what() );
-            } catch ( const exception _e ) {
-                THROW( KEY_NOT_FOUND, _e.what() );
+            } catch ( const exception& _e ) {
+                THROW( KEY_NOT_FOUND, fmt::format("[{}:{}] - [{}] [error_code=[{}], instance_name=[{}]",
+                                      __func__, __LINE__, _e.client_display_what(), _e.code(), _instance_name));
+            } catch ( const nlohmann::json::exception& _e ) {
+                irods::log( LOG_ERROR,
+                            fmt::format("[{}:{}] in [file={}] - json exception occurred [error={}], [instance_name={}]",
+                                         __func__,__LINE__,__FILE__, _e.what(), _instance_name));
+                THROW( SYS_LIBRARY_ERROR, _e.what() );
+            } catch ( const std::exception& _e ) {
+                THROW( SYS_INTERNAL_ERR,
+                            fmt::format("[{}:{}] in [file={}] - general exception occurred [error={}], [instance_name={}]",
+                                         __func__,__LINE__,__FILE__, _e.what(), _instance_name));
+            } catch ( ... ) {
+                THROW( SYS_UNKNOWN_ERROR,
+                       fmt::format( "[{}:{}] in [file={}], [instance_name={}]",__func__,__LINE__,__FILE__,_instance_name));
             }
 
 
