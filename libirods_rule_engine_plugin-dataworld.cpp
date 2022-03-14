@@ -16,9 +16,9 @@
 #include <irods/transport/default_transport.hpp>
 #include <irods/filesystem.hpp>
 
-#include "cpr/response.h"
-#include "cpr/session.h"
-#include "cpr/cpr.h"
+#include <cpr/response.h>
+#include <cpr/session.h>
+#include <cpr/cpr.h>
 
 #include <boost/any.hpp>
 #include <boost/format.hpp>
